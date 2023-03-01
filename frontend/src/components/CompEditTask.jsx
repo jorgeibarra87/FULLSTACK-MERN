@@ -1,24 +1,36 @@
 import axios from "axios";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const URI = 'http://localhost:4000/tasks/'
 
-const CompCreateTask = () => {
+const CompEditTask = () => {
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const navigate = useNavigate()
+    const { id } = useParams()
 
-    const createTask = async (e) => {
+    const updateTask = async (e) => {
         e.preventDefault()
-        await axios.post(URI, { title: title, content: content })
+        await axios.put(URI + id, {
+            title: title,
+            content: content
+        })
         navigate('/')
     }
+    useEffect(() => {
+        getTaskById()
+    }, [])
 
+    const getTaskById = async () => {
+        const res = await axios.get(URI + id)
+        setTitle(res.data.title)
+        setContent(res.data.content)
+    }
     return (
         <div>
-            <h3>Create Task</h3>
-            <form onSubmit={createTask}>
+            <h3>Edit Task</h3>
+            <form onSubmit={updateTask}>
                 <div className="mb-3">
                     <label className="form-label">Title</label>
                     <input
@@ -43,4 +55,4 @@ const CompCreateTask = () => {
     )
 }
 
-export default CompCreateTask
+export default CompEditTask
